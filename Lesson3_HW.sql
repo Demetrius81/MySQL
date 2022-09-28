@@ -120,7 +120,17 @@ WHERE amt > 1000;
 
 --6.	Напишите запрос который выбрал бы наименьшую сумму заказа для каждого заказчика. (“snum” - сумма в табличке “заказчики”)
 
-SELECT cnum, MIN(amt) AS `snum` FROM orders GROUP BY cnum;
+  --1 вариант с сортировкой по сумме заказа
+
+SELECT cnum AS `Номер заказчика`, MIN(amt) AS `snum` FROM orders GROUP BY cnum ORDER BY `snum`;
+
+  --2 вариант с использованием JOIN и сортировкой по сумме заказа
+
+SELECT customers.cname AS `Имя заказчика`, MIN(orders.amt) AS `snum` 
+FROM orders
+JOIN customers ON customers.cnum = orders.cnum 
+GROUP BY orders.cnum 
+ORDER BY `snum`;
 
 --7. 	Напишите запрос к табличке “Заказчики”, который может показать всех заказчиков, у которых рейтинг больше 100 и они находятся не в Риме.
 
@@ -158,12 +168,54 @@ VALUES
 
 --1.  Отсортируйте поле “сумма” в порядке убывания и возрастания
 
+SELECT salary AS `сумма` FROM staff
+ORDER BY salary;
 
+SELECT salary AS `сумма` FROM staff
+ORDER BY salary DESC;
 
 --2.  Отсортируйте по возрастанию поле “Зарплата” и выведите 5 строк с наибольшей заработной платой
 
+SELECT * FROM staff
+ORDER BY salary
+LIMIT 7, 5;
 
+/* 
+В принципе выполнил, но решение мне не нравится. 
+При добавлении в таблицу записей данное решение будет выводить некорректный результат.
+
+Такой вариант не работает
+
+SELECT * FROM staff
+HAVING salary = (SELECT salary FROM staff ORDER BY salary DESC LIMIT 5)
+ORDER BY salary;
+
+Здесь от переменной нельзя отнять значение (не разобрался с использованием переменных)
+
+SELECT @cnt := COUNT(*) FROM staff;
+SELECT * FROM staff
+ORDER BY salary
+LIMIT 5
+OFFSET @cnt - 5;
+
+Здесь пытался соединить таблицу с самой собой :)
+
+SELECT staff.*
+FROM staff
+JOIN 
+(SELECT salary FROM staff AS q ORDER BY salary DESC LIMIT 5)
+ON staff.salary = q.salary 
+GROUP BY staff.salary 
+ORDER BY staff.salary;
+
+Остальные фантастические решения я не прилагаю в силу безумия их автора :)
+
+Очень хочется увидеть корректное решение.
+*/
 
 --3.  Выполните группировку всех сотрудников по специальности “рабочий”, зарплата которых превышает 20000
 
-
+SELECT * FROM staff
+WHERE speciality IN ("рабочий")
+HAVING salary > 20000;
+ORDER BY salary;
