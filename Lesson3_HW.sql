@@ -180,38 +180,14 @@ SELECT * FROM staff
 ORDER BY salary
 LIMIT 7, 5;
 
-/* 
-В принципе выполнил, но решение мне не нравится. 
-При добавлении в таблицу записей данное решение будет выводить некорректный результат.
-
-Такой вариант не работает
-
 SELECT * FROM staff
-HAVING salary = (SELECT salary FROM staff ORDER BY salary DESC LIMIT 5)
+HAVING id IN (
+    SELECT id FROM (
+        SELECT id FROM staff 
+        ORDER BY salary DESC 
+        LIMIT 5) 
+    AS t)
 ORDER BY salary;
-
-Здесь от переменной нельзя отнять значение (не разобрался с использованием переменных)
-
-SELECT @cnt := COUNT(*) FROM staff;
-SELECT * FROM staff
-ORDER BY salary
-LIMIT 5
-OFFSET @cnt - 5;
-
-Здесь пытался соединить таблицу с самой собой :)
-
-SELECT staff.*
-FROM staff
-JOIN 
-(SELECT salary FROM staff AS q ORDER BY salary DESC LIMIT 5)
-ON staff.salary = q.salary 
-GROUP BY staff.salary 
-ORDER BY staff.salary;
-
-Остальные фантастические решения я не прилагаю в силу безумия их автора :)
-
-Очень хочется увидеть корректное решение.
-*/
 
 --3.  Выполните группировку всех сотрудников по специальности “рабочий”, зарплата которых превышает 20000
 
