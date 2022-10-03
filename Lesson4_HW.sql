@@ -58,6 +58,16 @@ DROP VIEW BMW;
 
 DROP VIEW other;
 
+SELECT
+	a.mark,
+	COUNT(a.mark),
+	(SELECT COUNT(au.mark)
+		FROM auto AS au
+		WHERE a.mark != au.mark) AS `Другие`
+FROM auto AS a
+GROUP BY mark
+HAVING a.mark = 'BMW';
+
 --Даны 2 таблицы, созданные следующим образом:
 
 CREATE TABLE test_a (

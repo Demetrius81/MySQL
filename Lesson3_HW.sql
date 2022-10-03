@@ -77,7 +77,7 @@ REFERENCES salespeople (snum)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
-INSERT INTO orders (onum, amt, odate, cnum, snum)
+INSERT INTO orders --(onum, amt, odate, cnum, snum)
 VALUES
 (3001, 18.69, "1990-03-10", 2008, 1007),
 (3003, 767.19, "1990-03-10", 2001, 1001),
