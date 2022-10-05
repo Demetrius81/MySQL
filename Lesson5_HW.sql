@@ -131,8 +131,6 @@ DROP TABLE Orders;
 
 --Вывести название и цену для всех анализов, которые продавались 5 февраля 2020 и всю следующую неделю.
 
--- 1 вариант
-
 SELECT an_name AS `Название анализа`,an_cost AS `Себестоимость` , an_price AS `Цена(розничная)` FROM Analysis an
 LEFT JOIN Orders o
 ON an.an_id = o.ord_an
@@ -143,31 +141,6 @@ WHERE
 );
 
 
-SELECT an_name AS `Название анализа`,an_cost AS `Себестоимость` , an_price AS `Цена(розничная)` FROM Analysis
-WHERE an_id IN 
-(
-    SELECT ord_an AS oa FROM Orders 
-    WHERE 
-    (
-        DAYOFYEAR(ord_datetime) BETWEEN DAYOFYEAR('2020-02-05') AND (DAYOFYEAR('2020-02-05') + 7)
-        AND YEAR(ord_datetime) = YEAR('2020-02-05')
-    )
-);
-
-
-DAYOFYEAR(ord_datetime) BETWEEN DAYOFYEAR('2020-02-05') AND ((DAYOFYEAR('2020-02-05') + 7)
-        --AND YEAR(ord_datetime) = YEAR('2020-02-05')
-
-SELECT 
-    an_name AS `Название анализа`,
-    an_cost AS `Себестоимость` ,
-    an_price AS `Цена(розничная)`
-	(SELECT COUNT(au.mark)
-		FROM auto AS au
-		WHERE a.mark != au.mark) AS `Другие`
-FROM auto AS a
-GROUP BY mark
-HAVING a.mark = 'BMW';
 
 
 
@@ -186,13 +159,31 @@ WHERE
     DAYOFYEAR(o.ord_datetime) BETWEEN DAYOFYEAR('2020-02-05') AND (DAYOFYEAR('2020-02-05') + 7) 
     AND YEAR(o.ord_datetime) = YEAR('2020-02-05')
 )
-GROUP BY o.ord_an;;
+GROUP BY o.ord_an;
 
 
 -- Задача 3
 --Таблица train_schedule
 
+CREATE TABLE train_schedule
+(
+    train_id INT NOT NULL,
+    stantion VARCHAR(50) NOT NULL,    
+    stantion_time TIME NOT NULL
+);
 
+INSERT INTO train_schedule (train_id, stantion, stantion_time) VALUES
+(110, 'San Francisco', '10:00:00'),
+(110, 'Redwood City', '10:54:00'),
+(110, 'Palo Alto', '11:02:00'),
+(110, 'San Jose', '12:35:00'),
+(120, 'San Francisco', '11:00:00'),
+(120, 'Palo Alto', '12:49:00'),
+(120, 'San Jose', '13:30:00');
+
+SELECT * FROM train_schedule;
+
+DROP TABLE train_schedule;
 
 -- Добавьте новый столбец под названием «время до следующей станции». Чтобы получить это значение, 
 -- мы вычитаем время станций для пар смежных станций. 
@@ -200,3 +191,11 @@ GROUP BY o.ord_an;;
 -- Проще это сделать с помощью оконной функции LEAD . 
 -- Эта функция сравнивает значения из одной строки со следующей строкой, чтобы получить результат. 
 -- В этом случае функция сравнивает значения в столбце «время» для станции со станцией сразу после нее.
+
+SELECT
+    train_id AS `Номер поезда`,
+    stantion AS `Станция`, 
+    stantion_time AS `Время убытия`,
+     (LEAD(stantion_time), stantion_time) OVER() AS `Время в пути`   
+FROM train_schedule;
+
