@@ -140,28 +140,6 @@ WHERE
     AND YEAR(o.ord_datetime) = YEAR('2020-02-05')
 );
 
-
-
-
-
-SELECT
-    an_name
-OVER(
-    PARTITION BY tb    
-)  AS `Название анализа`,
-    an_cost AS `Себестоимость` , 
-    an_price AS `Цена(розничная)`    
-FROM Analysis
-LEFT JOIN Orders o
-ON an.an_id = o.ord_an
-WHERE 
-(
-    DAYOFYEAR(o.ord_datetime) BETWEEN DAYOFYEAR('2020-02-05') AND (DAYOFYEAR('2020-02-05') + 7) 
-    AND YEAR(o.ord_datetime) = YEAR('2020-02-05')
-)
-GROUP BY o.ord_an;
-
-
 -- Задача 3
 --Таблица train_schedule
 
@@ -192,17 +170,52 @@ DROP TABLE train_schedule;
 -- Эта функция сравнивает значения из одной строки со следующей строкой, чтобы получить результат. 
 -- В этом случае функция сравнивает значения в столбце «время» для станции со станцией сразу после нее.
 
+WITH ts AS
+(
+  SELECT 
+    *,
+    LEAD(stantion_time) OVER(PARTITION BY train_id) AS next_stantion_time
+  FROM train_schedule
+)
 SELECT
     train_id AS `Номер поезда`,
     stantion AS `Станция`, 
     stantion_time AS `Время убытия`,    
-    LEAD(stantion_time) OVER(PARTITION BY train_id) AS next_stantion_time
-
-    --(LEAD(stantion_time), stantion_time) OVER(PARTITION BY train_id) w -- AS `Время в пути`
-
-FROM train_schedule
-WINDOW w AS ();
+    TIMEDIFF(next_stantion_time, stantion_time) AS `Время в пути`
+FROM ts;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+WITH C AS
+(
+  SELECT *,
+    MAX(gooddt) OVER(PARTITION BY locid
+                     ORDER BY dt
+                     ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS prevdt,
+    MIN(gooddt) OVER(PARTITION BY locid
+                     ORDER BY dt
+                     ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING) AS nextdt
+  FROM dbo.Precipitation
+    CROSS APPLY ( VALUES( CASE WHEN val > 24 THEN dt END ) ) AS A(gooddt)
+)
+SELECT locid, dt, val,
+  DATEDIFF(day, prevdt, dt) AS diffprev,
+  DATEDIFF(day, dt, nextdt) AS diffnext
+FROM C
+/* ORDER BY locid, dt */ ;
 
 SELECT TIMEDIFF(time('00:01:10'), time('00:00:10'));
