@@ -132,7 +132,7 @@ DROP TABLE Orders;
 --Вывести название и цену для всех анализов, которые продавались 5 февраля 2020 и всю следующую неделю.
 
 SELECT an_name AS `Название анализа`,an_cost AS `Себестоимость` , an_price AS `Цена(розничная)` FROM Analysis an
-LEFT JOIN Orders o
+JOIN Orders o
 ON an.an_id = o.ord_an
 WHERE 
 (
@@ -196,6 +196,8 @@ SELECT
     train_id AS `Номер поезда`,
     stantion AS `Станция`, 
     stantion_time AS `Время убытия`,
-     (LEAD(stantion_time), stantion_time) OVER() AS `Время в пути`   
+    --TIMEDIFF(t, stantion_time) OVER(PARTITION by LEAD(stantion_time) AS t),
+    LEAD(stantion_time) OVER(PARTITION BY train_id)  
 FROM train_schedule;
 
+SELECT TIMEDIFF(time('00:01:10'), time('00:00:10'));
