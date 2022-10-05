@@ -195,9 +195,14 @@ DROP TABLE train_schedule;
 SELECT
     train_id AS `Номер поезда`,
     stantion AS `Станция`, 
-    stantion_time AS `Время убытия`,
-    --TIMEDIFF(t, stantion_time) OVER(PARTITION by LEAD(stantion_time) AS t),
-    LEAD(stantion_time) OVER(PARTITION BY train_id)  
-FROM train_schedule;
+    stantion_time AS `Время убытия`,    
+    LEAD(stantion_time) OVER(PARTITION BY train_id) AS next_stantion_time
+
+    --(LEAD(stantion_time), stantion_time) OVER(PARTITION BY train_id) w -- AS `Время в пути`
+
+FROM train_schedule
+WINDOW w AS ();
+
+
 
 SELECT TIMEDIFF(time('00:01:10'), time('00:00:10'));
