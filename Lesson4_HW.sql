@@ -58,6 +58,8 @@ DROP VIEW BMW;
 
 DROP VIEW other;
 
+--использование подзапросов
+
 SELECT
 	a.mark,
 	COUNT(a.mark),
@@ -95,3 +97,4 @@ SELECT * FROM test_a
 LEFT JOIN test_b
 ON test_b.id = test_a.id
 WHERE test_b.id IS NULL;
+
