@@ -96,8 +96,6 @@ BEGIN
   SET i = 1;
   SET prev = 1;
   set rez = 1;
-  --IF (num < 0, NULL);
-  --IF (num = 1, '1');
   SET response = CONCAT(prev, ' ', rez);   
   WHILE i < num - 1 DO    
     SET rez = prev + prev2;
