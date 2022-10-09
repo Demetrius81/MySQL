@@ -70,6 +70,15 @@ FROM auto AS a
 GROUP BY mark
 HAVING a.mark = 'BMW';
 
+--еще вариант с подзапросами
+
+SELECT 
+MARK,
+COUNT(MARK) AS `число машин данной марки`,
+(SELECT COUNT(MARK) FROM AUTO AS A1 WHERE A2.MARK != A1.MARK) AS `число машин других марок`
+FROM AUTO AS A2
+GROUP BY MARK;
+
 --Даны 2 таблицы, созданные следующим образом:
 
 CREATE TABLE test_a (
