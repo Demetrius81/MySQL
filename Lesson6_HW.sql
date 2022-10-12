@@ -54,6 +54,48 @@ SELECT n, parse_seconds_to_datestring(n) from num;
 --Задача 2.	Выведите только четные числа от 1 до 10 включительно.
 --Пример: 2,4,6,8,10 (можно сделать через шаг +  2: х = 2, х+=2)
 
+DROP FUNCTION IF EXISTS nums;
+DELIMITER $$
+CREATE FUNCTION nums() RETURNS VARCHAR(50)
+DETERMINISTIC
+  BEGIN
+    DECLARE i INT;
+        DECLARE str VARCHAR(50);
+        SET str = ' ';
+    SET i = 2;
+    WHILE i < 11 DO
+      SET str = CONCAT(str, ' ', i);
+            SET i = i + 2;
+    END WHILE;
+RETURN str;
+END $$
+DELIMITER ;
+SELECT nums();
+
+
+DELIMITER $$
+CREATE PROCEDURE nums()
+  BEGIN
+    DECLARE i INT;
+    SET i = 2;
+    CREATE TEMPORARY TABLE nums (numbers int);
+    WHILE i < 11 DO
+      INSERT INTO nums VALUES (i);
+      SET i = i + 2;
+    END WHILE;
+    SELECT * FROM nums;
+    DROP TABLE IF EXISTS nums;
+END $$
+DELIMITER ;
+
+CALL nums();
+
+
+DROP PROCEDURE nums;
+
+
+
+
 -- 1 вариант решения - процедура с входным параметром, 
 -- определение четности числа в цикле, 
 -- создание и заполнение временной таблицы и ее вывод
